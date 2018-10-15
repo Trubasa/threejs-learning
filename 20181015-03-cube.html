@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="js/three.js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+</body>
+<script>
+    var scene=new THREE.Scene();
+    var camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,1,1000);
+    camera.position.z=400
+    var renderer=new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    document.body.appendChild(renderer.domElement)
+
+    function render() {
+        renderer.render(scene,camera);
+        requestAnimationFrame(render)
+    }
+    render();
+
+    var control=new THREE.OrbitControls(camera);
+
+
+    var material=new THREE.LineBasicMaterial({color:'#333'})
+    for(var x=-400;x<=400;x+=20){
+        var geometry=new THREE.Geometry();
+        geometry.vertices.push(new THREE.Vector3(x,0,-400));
+        geometry.vertices.push(new THREE.Vector3(x,0,+400));
+        var line=new THREE.Line(geometry,material,THREE.LineSegments)
+        scene.add(line)
+        var line=new THREE.Line(geometry,material,THREE.LineSegments)
+        line.rotation.y=Math.PI/2
+        scene.add(line)
+    }
+
+    scene.background=new THREE.Color(0xf0f0f0)
+
+    var geometry=new THREE.BoxGeometry(200,200,200);
+    for(var i=0;i<geometry.faces.length;i+=2){
+        var hex=Math.random()*0xffffff;
+        geometry.faces[i].color.setHex(hex)
+        geometry.faces[i+1].color.setHex(hex)
+    }
+    var material=new THREE.MeshBasicMaterial({ vertexColors: THREE.FaceColors, overdraw: 0.5 });
+    var cube=new THREE.Mesh(geometry,material);
+    scene.add(cube);
+
+
+    var geometry=new THREE.PlaneGeometry(200,200);
+    for(var i=0;i<geometry.faces.length;i++){
+        geometry.faces[i].color.setHex(0x999999)
+    }
+    var material=new THREE.MeshBasicMaterial({ vertexColors: THREE.FaceColors, overdraw: 0.5 })
+    var shadow=new THREE.Mesh(geometry,material)
+
+    console.log(geometry);
+    scene.add(shadow)
+    shadow.rotateX(-Math.PI/2)
+    shadow.position.y=-150;
+
+</script>
+</html>

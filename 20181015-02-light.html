@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/three.js/three.js"></script>
+</head>
+<body>
+
+</body>
+<script>
+    var scene=new THREE.Scene();
+    var camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,1,10000);
+    camera.position.z=5
+    var renderer=new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    document.body.appendChild(renderer.domElement)
+
+    var geometry=new THREE.BoxGeometry(1,1,1);
+    var material=new THREE.MeshBasicMaterial({color:'tan'});
+    var cube=new THREE.Mesh(geometry,material);
+    scene.add(cube);
+
+    function cubeAction() {
+        cube.rotation.x+=0.01
+        cube.rotation.y+=0.01
+        requestAnimationFrame(cubeAction)
+    }
+
+    function render() {
+        renderer.render(scene,camera)
+        requestAnimationFrame(render);
+    }
+    cubeAction();
+    render();
+
+    var ambientLight=new THREE.AmbientLight('red',1);
+    ambientLight.position.set(10,10,10)
+    scene.add(ambientLight);
+
+    var light=new THREE.PointLight('red',1,100);
+
+    light.position.set(10,10,10)
+    scene.add(light)
+
+</script>
+</html>
