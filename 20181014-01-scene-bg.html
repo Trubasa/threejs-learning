@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--<script src="js/three-dev.js/three.js"></script>-->
+    <script src="js/three.js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+</head>
+<body>
+</body>
+<script>
+    //scene
+    var scene=new THREE.Scene();
+    //envmap
+    var path = 'static/textures/cube/Bridge2/';
+    var format = '.jpg';
+    var envMap = new THREE.CubeTextureLoader().load( [
+        path + 'posx' + format, path + 'negx' + format,
+        path + 'posy' + format, path + 'negy' + format,
+        path + 'posz' + format, path + 'negz' + format
+    ] );
+    scene.background=envMap
+
+    //camera
+    var camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,1000);
+    //control
+    controls = new THREE.OrbitControls( camera );
+    controls.target.set( 0, 1, 1 );
+    controls.update();
+
+    //renderer
+    var renderer=new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setSize(window.innerWidth,window.innerHeight);
+
+    document.body.appendChild(renderer.domElement);
+
+    function render() {
+        renderer.render(scene,camera);
+        requestAnimationFrame(render)
+    }
+    render();
+
+</script>
+</html>
