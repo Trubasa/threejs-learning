@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/three.js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+</head>
+<body>
+</body>
+<script>
+    var scene=new THREE.Scene();
+    scene.background=new THREE.Color(0xefefef);
+
+    var camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,1,10000);
+    camera.position.z=300;
+
+    var control=new THREE.OrbitControls(camera);
+
+    var renderer=new THREE.WebGLRenderer({
+        antialias:true
+    })
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    function render() {
+        renderer.render(scene,camera)
+        requestAnimationFrame(render)
+    }
+    render();
+
+    var material=null;
+    var geometry=null;
+
+    var path='static/textures/cube/skybox/'
+    var envMap=new THREE.CubeTextureLoader().load([
+        path+'px.jpg',path+'nx.jpg',
+        path+'py.jpg',path+'ny.jpg',
+        path+'pz.jpg',path+'nz.jpg',
+    ])
+    scene.background=envMap
+
+</script>
+</html>

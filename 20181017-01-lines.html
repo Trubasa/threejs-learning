@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/three.js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+    <script src="js/renderers/Projector.js"></script>
+    <script src="js/renderers/CanvasRenderer.js"></script>
+</head>
+<body>
+
+</body>
+<script>
+    var scene=new THREE.Scene();
+    var camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,1,10000);
+    camera.position.z=100;
+
+    var control=new THREE.OrbitControls(camera);
+
+    var renderer=new THREE.CanvasRenderer({
+        antialias:true
+    })
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    function onResize(){
+        console.log('onresize');
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix()
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    }
+    window.addEventListener('resize',onResize,false);
+
+    function render() {
+        renderer.render(scene,camera);
+        requestAnimationFrame(render);
+    }
+    render();
+
+    var PI2 = Math.PI * 2;
+    var material = new THREE.SpriteCanvasMaterial( {
+
+        color: 0xffffff,
+        program: function ( context ) {
+
+            context.beginPath();
+            context.arc( 0, 0, 0.5, 0, PI2, true );
+            context.fill();
+
+        }
+
+    } );
+
+    var points = [];
+    var spriteMap=new THREE.TextureLoader().load('static/images/miku.jpg')
+    var spriteMaterial=new THREE.SpriteMaterial({map:spriteMap})
+    for ( var i = 0; i < 100; i ++ ) {
+
+        var particle = new THREE.Sprite(material);
+        particle.position.x=(Math.random()-0.5)*1;
+        particle.position.y=(Math.random()-0.5)*1;
+        particle.position.z=(Math.random()-0.5)*1;
+        particle.position.normalize();
+        particle.position.multiplyScalar( Math.random() * 10 + 450 );
+        particle.scale.x=10;
+        particle.scale.y=10;
+        scene.add( particle );
+
+        points.push( particle.position );
+
+    }
+
+    /*var PI2=Math.PI*2;
+    var material=new THREE.SpriteCanvasMaterial({
+        color:0xffffff,
+        program:function (context) {
+            context.beginPath();
+            context.arc(0,0,0.5,0,PI2,true);
+            context.fill()
+        }
+    })
+
+    var points=[];
+    for(var i=0;i<100;i++){
+        var particle=new THREE.Sprite(material);
+        particle.position.x=Math.random()-0.5;
+        particle.position.y=Math.random()-0.5;
+        particle.position.z=Math.random()-0.5;
+        particle.position.normalize();
+        particle.position.multiplyScalar(Math.random()*10+450);
+        scene.add(particle)
+        points.push(particle.position)
+    }*/
+
+    var line=new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(points),
+        new THREE.LineBasicMaterial({color:0xffffff,opacity:0.5}),
+        THREE.LineSegments
+    )
+    scene.add(line)
+
+</script>
+</html>

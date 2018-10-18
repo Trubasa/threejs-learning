@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/three.js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+</body>
+<script>
+    var scene=new THREE.Scene();
+    scene.background=new THREE.Color(0xefefef);
+
+    var camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,1,10000);
+    camera.position.z=500;
+
+
+
+    var renderer=new THREE.WebGLRenderer({
+        antialias:true
+    })
+    renderer.setSize(window.innerWidth,window.innerHeight);
+
+    var control=new THREE.OrbitControls(camera);
+
+    document.body.appendChild(renderer.domElement)
+
+    function render() {
+        renderer.render(scene,camera);
+        requestAnimationFrame(render)
+    }
+    render();
+
+    var material=new THREE.LineBasicMaterial({color:'#353535'});
+    for(var x=-1000;x<=1000;x+=40){
+        var geometry=new THREE.Geometry();
+        geometry.vertices.push(new THREE.Vector3(x,0,-1000));
+        geometry.vertices.push(new THREE.Vector3(x,0,1000));
+        var line=new THREE.Line(geometry,material,THREE.LineSegments);
+        scene.add(line);
+        var line=new THREE.Line(geometry,material,THREE.LineSegments);
+        line.rotation.y=Math.PI/2;
+        scene.add(line);
+    }
+
+    var loader=new THREE.TextureLoader();
+
+    var texture=new THREE.TextureLoader().load('static/textures/land_ocean_ice_cloud_2048.jpg');
+    var geometry=new THREE.SphereBufferGeometry(200,200,200);
+    var material=new THREE.MeshBasicMaterial({
+        map:texture,
+        overdraw:false,
+        transparent:true,
+        opacity:0.5
+    });
+    /*var material=new THREE.MeshNormalMaterial({
+        wireframe:true
+    })*/
+    var sphere=new THREE.Mesh(geometry,material);
+    scene.add(sphere)
+
+    function sphereAnimation(){
+        sphere.rotation.y-=0.001;
+        requestAnimationFrame(sphereAnimation)
+    }
+    sphereAnimation();
+
+    /*loader.load('static/textures/land_ocean_ice_cloud_2048.jpg',function (texture) {
+        var geometry=new THREE.SphereBufferGeometry(200,200,200);
+        var material=new THREE.MeshBasicMaterial({
+            map:texture,
+            overdraw:true
+        });
+        var sphere=new THREE.Mesh(geometry,material);
+        scene.add(sphere)
+    })*/
+
+
+</script>
+</html>
