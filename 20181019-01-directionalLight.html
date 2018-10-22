@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/three.js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+    <script src="js/libs/dat.gui.min.js"></script>
+</head>
+<body>
+
+</body>
+<script>
+    var scene=new THREE.Scene();
+    var camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,1,10000);
+    camera.position.z=20
+    var renderer=new THREE.WebGLRenderer({
+        antialias:true
+    })
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.shadowMap.enabled = true;
+    // renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+    document.body.appendChild(renderer.domElement);
+
+    var control=new THREE.OrbitControls(camera,renderer.domElement)
+
+    function render(){
+        renderer.render(scene,camera);
+        requestAnimationFrame(render)
+    }
+    render();
+
+    /*var camera2=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,1,10000);
+    camera2.position.z=20
+    scene.add(camera2)
+    scene.add(new THREE.CameraHelper(camera2));*/
+    scene.add(new THREE.AxesHelper())
+
+    function onResize(){
+        console.log('onResize');
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        if(camera){
+            camera.aspect=window.innerWidth/window.innerHeight;
+            camera.updateProjectionMatrix()
+        }
+
+    }
+    window.addEventListener('resize',onResize,false);
+
+    var light = new THREE.AmbientLight( 0x404040,0.5); // soft white light
+    scene.add( light );
+
+    var cube=new THREE.Mesh(
+        new THREE.BoxGeometry(2,2,2),
+        new THREE.MeshLambertMaterial({color:'tan'})
+    )
+    cube.position.x=5
+    cube.position.y=4
+    cube.castShadow=true;
+    scene.add(cube)
+
+    var plane=new THREE.Mesh(
+        new THREE.PlaneBufferGeometry(20,20),
+        new THREE.MeshLambertMaterial({color:'tan'})
+    )
+    plane.rotation.x=-Math.PI/2;
+    plane.receiveShadow=true
+    scene.add(plane)
+
+    var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+    directionalLight.position.x=10;
+    directionalLight.position.y=10;
+    directionalLight.position.z=10;
+    directionalLight.castShadow=true
+    scene.add( directionalLight );
+
+    function buildGui() {
+        gui = new dat.GUI();
+
+        var params = {
+            'position x':directionalLight.position.x,
+            'position y':directionalLight.position.y,
+            'position z':directionalLight.position.z,
+        }
+        gui.add( params, 'position x', -100, 100 ).onChange( function ( val ) {
+
+            directionalLight.position.x = val;
+
+        } );
+        gui.add( params, 'position y', -100, 100 ).onChange( function ( val ) {
+
+            directionalLight.position.y = val;
+
+        } );
+        gui.add( params, 'position z', -100, 100 ).onChange( function ( val ) {
+
+            directionalLight.position.z = val;
+
+        } );
+    }
+    buildGui();
+</script>
+</html>

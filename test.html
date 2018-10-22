@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js webgl - lights - spotlight</title>
+    <title>three.js webgl - buffergeometry - indexed</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
         body {
-            background-color: #000;
+            color: #cccccc;
+            font-family:Monospace;
+            font-size:13px;
+            text-align:center;
+
+            background-color: #050505;
             margin: 0px;
             overflow: hidden;
         }
@@ -14,144 +19,183 @@
         #info {
             position: absolute;
             top: 0px; width: 100%;
-            color: #ffffff;
             padding: 5px;
-            font-family: Monospace;
-            font-size: 13px;
-            text-align: center;
         }
 
         a {
-            color: #ff0080;
-            text-decoration: none;
-        }
-
-        a:hover {
             color: #0080ff;
         }
+
     </style>
 </head>
 <body>
 
-<div id="info">
-    <a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - spotlight by <a href="http://master-domain.com" target="_blank" rel="noopener">Master James</a><br />
-</div>
+<div id="container"></div>
+<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - indexed</div>
 
 <script src="js/three.js/three.js"></script>
-<script src="js/controls/OrbitControls.js"></script>
+<script src="js/libs/dat.gui.min.js"></script>
 
-<!--<script src="js/libs/dat.gui.min.js"></script>-->
-
-<!--<script src="js/WebGL.js"></script>-->
 
 <script>
 
-    /*if ( WEBGL.isWebGLAvailable() === false ) {
 
-        document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-    }*/
+    var camera, scene, renderer, stats;
 
-    var renderer, scene, camera;
+    var mesh;
 
-    var spotLight, lightHelper, shadowCameraHelper;
-
-    var gui;
+    init();
+    animate();
 
     function init() {
 
-        renderer = new THREE.WebGLRenderer();
+        //
+
+        camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+        camera.position.z = 64;
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color( 0x050505 );
+
+        //
+
+        var ambientLight = new THREE.AmbientLight( 0x222222 );
+        scene.add( ambientLight );
+
+        var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+        light1.position.set( 1, 1, 1 );
+        scene.add( light1 );
+
+        var light2 = new THREE.DirectionalLight( 0xffffff, 1 );
+        light2.position.set( 0, - 1, 0 );
+        scene.add( light2 );
+
+        //
+
+        var geometry = new THREE.BufferGeometry();
+
+        var indices = [];
+
+        var vertices = [];
+        var normals = [];
+        var colors = [];
+
+        var size = 20;
+        var segments = 1;
+
+        var halfSize = size / 2;
+        var segmentSize = size / segments;
+
+        // generate vertices, normals and color data for a simple grid geometry
+
+        for ( var i = 0; i <= segments; i ++ ) {
+
+            var y = ( i * segmentSize ) - halfSize;
+
+            for ( var j = 0; j <= segments; j ++ ) {
+
+                var x = ( j * segmentSize ) - halfSize;
+
+                vertices.push( x, - y, 0 );
+                normals.push( 0, 0, 1 );
+
+                var r = ( x / size ) + 0.5;
+                var g = ( y / size ) + 0.5;
+
+                colors.push( r, g, 1 );
+
+            }
+
+        }
+
+        // generate indices (data for element array buffer)
+
+        for ( var i = 0; i < segments; i ++ ) {
+
+            for ( var j = 0; j < segments; j ++ ) {
+
+                var a = i * ( segments + 1 ) + ( j + 1 );
+                var b = i * ( segments + 1 ) + j;
+                var c = ( i + 1 ) * ( segments + 1 ) + j;
+                var d = ( i + 1 ) * ( segments + 1 ) + ( j + 1 );
+
+                // generate two faces (triangles) per iteration
+
+                indices.push( a, b, d ); // face one
+                indices.push( b, c, d ); // face two
+
+            }
+
+        }
+
+        //
+
+        geometry.setIndex( indices );
+        geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+        geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+        geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+        var material = new THREE.MeshPhongMaterial( {
+            specular: 0x111111, shininess: 250,
+            side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+        } );
+
+        mesh = new THREE.Mesh( geometry, material );
+        scene.add( mesh );
+
+        //
+
+        renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( renderer.domElement );
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-        renderer.gammaInput = true;
-        renderer.gammaOutput = true;
-
-        scene = new THREE.Scene();
-
-        camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 1000 );
-        camera.position.set( 65, 8, - 10 );
-
-        var controls = new THREE.OrbitControls( camera, renderer.domElement );
-        controls.addEventListener( 'change', render );
-        controls.minDistance = 20;
-        controls.maxDistance = 500;
-        controls.enablePan = false;
-
-        var ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
-        // scene.add( ambient );
-
-        spotLight = new THREE.SpotLight( 0xffffff, 1 );
-        spotLight.position.set( 15, 40, 35 );
-        spotLight.angle = Math.PI / 4;
-        spotLight.penumbra = 0.05;
-        spotLight.decay = 2;
-        spotLight.distance = 200;
-
-        spotLight.castShadow = true;
-        spotLight.shadow.mapSize.width = 1024;
-        spotLight.shadow.mapSize.height = 1024;
-        spotLight.shadow.camera.near = 10;
-        spotLight.shadow.camera.far = 200;
-        scene.add( spotLight );
-
-        /*lightHelper = new THREE.SpotLightHelper( spotLight );
-        scene.add( lightHelper );*/
-
-        shadowCameraHelper = new THREE.CameraHelper( spotLight.shadow.camera );
-        scene.add( shadowCameraHelper );
-
-        // scene.add( new THREE.AxesHelper( 10 ) );
-
-        var material = new THREE.MeshPhongMaterial( { color: 0x808080, dithering: true } );
-
-        var geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
-
-        var mesh = new THREE.Mesh( geometry, material );
-        mesh.position.set( 0, - 1, 0 );
-        mesh.rotation.x = - Math.PI * 0.5;
-        mesh.receiveShadow = true;
-        scene.add( mesh );
-
-        var material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
-
-        var geometry = new THREE.BoxBufferGeometry( 3, 1, 2 );
-
-        var mesh = new THREE.Mesh( geometry, material );
-        mesh.position.set( 40, 2, 0 );
-        mesh.castShadow = true;
-        scene.add( mesh );
-
-        controls.target.copy( mesh.position );
-        controls.update();
+        //
 
 
+        //
+
+        var gui = new dat.GUI();
+        gui.add( material, 'wireframe' );
+
+        //
+
+        window.addEventListener( 'resize', onWindowResize, false );
 
     }
 
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+    }
+
+    //
+
+    function animate() {
+
+        requestAnimationFrame( animate );
+
+        render();
+
+    }
 
     function render() {
 
-        // lightHelper.update();
+        var time = Date.now() * 0.001;
 
-        // shadowCameraHelper.update();
+        mesh.rotation.x = time * 0.25;
+        mesh.rotation.y = time * 0.5;
 
         renderer.render( scene, camera );
 
     }
 
-
-
-    init();
-
-
-    render();
-
 </script>
 
 </body>
-
 </html>

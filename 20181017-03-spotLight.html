@@ -121,33 +121,28 @@
         gui.add( params, 'position x', -100, 100 ).onChange( function ( val ) {
 
             spotLight.position.x = val;
-            render();
 
         } );
         gui.add( params, 'position y', -100, 100 ).onChange( function ( val ) {
 
             spotLight.position.y = val;
-            render();
 
         } );
         gui.add( params, 'position z', -100, 100 ).onChange( function ( val ) {
 
             spotLight.position.z = val;
-            render();
 
         } );
 
         gui.addColor( params, 'light color' ).onChange( function ( val ) {
 
             spotLight.color.setHex( val );
-            render();
 
         } );
 
         gui.add( params, 'intensity', 0, 2 ).onChange( function ( val ) {
 
             spotLight.intensity = val;
-            render();
 
         } );
 
@@ -155,28 +150,24 @@
         gui.add( params, 'distance', 50, 200 ).onChange( function ( val ) {
 
             spotLight.distance = val;
-            render();
 
         } );
 
         gui.add( params, 'angle', 0, Math.PI / 3 ).onChange( function ( val ) {
 
             spotLight.angle = val;
-            render();
 
         } );
 
         gui.add( params, 'penumbra', 0, 1 ).onChange( function ( val ) {
 
             spotLight.penumbra = val;
-            render();
 
         } );
 
         gui.add( params, 'decay', 1, 2 ).onChange( function ( val ) {
 
             spotLight.decay = val;
-            render();
 
         } );
 

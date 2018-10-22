@@ -67,8 +67,9 @@
         -1.0,  1.0,  -1.0,
         -1.0, -1.0,  -1.0,
     ]);
+    console.log('vertices',vertices);
     geometry.addAttribute('position',new THREE.BufferAttribute(vertices,3));
-    var material=new THREE.MeshBasicMaterial({color:'tan'});
+    var material=new THREE.MeshBasicMaterial({color:'tan',side:THREE.DoubleSide});
     var mesh=new THREE.Mesh(geometry,material)
     scene.add(mesh);
     console.log(geometry.attributes);
