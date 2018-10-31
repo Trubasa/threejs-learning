@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/three.js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+</body>
+<script>
+    var scene=new THREE.Scene();
+
+    var camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,1,10000);
+    camera.position.z=1500;
+
+    var renderer=new THREE.WebGLRenderer({
+        antialias:true
+    });
+    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    document.body.appendChild(renderer.domElement)
+
+    var control=new THREE.OrbitControls(camera,renderer.domElement)
+
+    function render() {
+        renderer.render(scene,camera);
+        requestAnimationFrame(render)
+    }
+    render();
+
+    var colors=[];
+    var positions=[];
+    
+    var num=1000;
+    var num2=num/2;
+    var value=0.5
+    for(var x=0;x<=1000;x+=50){
+        for(var y=0;y<=1000;y+=10){
+            for(var z=0;z<=1000;z+=10){
+                var randomNum=Math.random()*2-1;
+                var randomX=(x-num2)*(Math.random()*2-1);
+                var randomY=(y-num2)*(Math.random()*2-1);
+                var randomZ=(z-num2)*(Math.random()*2-1);
+                positions.push(randomX,randomY,randomZ);
+                colors.push(randomX/num+value,randomY/num+value,randomZ/num+value);
+            }
+        }
+    }
+
+
+
+    var geometry=new THREE.BufferGeometry();
+    geometry.addAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+    geometry.addAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+    geometry.computeBoundingSphere();
+    var lineMaterial=new THREE.LineBasicMaterial({vertexColors:THREE.VertexColors,size:5});
+    var line=new THREE.Line(geometry,lineMaterial);
+
+    scene.add(line);
+
+</script>
+</html>
